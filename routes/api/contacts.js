@@ -1,25 +1,17 @@
 const express = require('express')
+const {contactsController} = require('../../controllers')
+const { contactsMiddleware } = require('../../middlewares')
 
 const router = express.Router()
 
-router.get('/', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+router.get('/', contactsMiddleware.readFile, contactsController.listContacts)
 
-router.get('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+router.post('/', contactsMiddleware.checkContactFields, contactsMiddleware.readFile, contactsController.addContact)
 
-router.post('/', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+router.get('/:contactId', contactsMiddleware.checkContactId, contactsController.getContactById)
 
-router.delete('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+router.delete('/:contactId', contactsMiddleware.readFile, contactsMiddleware.checkContactId, contactsController.removeContact)
 
-router.put('/:contactId', async (req, res, next) => {
-  res.json({ message: 'template message' })
-})
+router.put('/:contactId', contactsMiddleware.readFile, contactsMiddleware.checkContactId, contactsMiddleware.checkIfBody, contactsMiddleware.checkContactFields, contactsController.updateContact)
 
 module.exports = router
