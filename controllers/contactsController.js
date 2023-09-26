@@ -1,42 +1,35 @@
-const fs = require('fs').promises
-const uuid = require('uuid').v4
+const { getAllContacts, getContactById, deleteContact, createContact, updateContactData, updateContactFavorite } = require('../services/contactServices')
+const { catchAsync } = require('../utils')
 
-exports.listContacts = async (req, res) => {
-  const contacts = req.contacts
+exports.listContacts = catchAsync(async (req, res) => {
+  const contacts = await getAllContacts()
   res.status(200).json(contacts)
-} 
+} )
 
-exports.getContactById = (req, res) => {
-  const contact = req.contact
+exports.getContactById = catchAsync( async(req, res) => {
+  const contact = await getContactById(req.params.contactId)
   res.status(200).json(contact)
-}
+})
 
-exports.removeContact = (req, res) => {
-  const contacts = req.contacts
-  const { contactId } = req.params
-  contacts.splice(contacts.findIndex(({ id }) => id === contactId), 1)
-  fs.writeFile('./models/contacts.json', JSON.stringify(contacts, null, 2))
+exports.removeContact = catchAsync(async (req, res) => {
+  await deleteContact(req.params.contactId)
   res.status(200).json({"message": "contact deleted"})
-  
-}
+})
 
-exports.addContact = (req, res) => {
-  const {name, phone, email} = req.newContact
-    const newContact = {id:uuid(), name, email, phone,}
-    const contacts = req.contacts
-    contacts.push(newContact)
-    fs.writeFile('./models/contacts.json', JSON.stringify(contacts, null, 2))
+exports.addContact = catchAsync(async (req, res) => {
+    const newContact = await createContact(req.body)
     res.status(201).json(newContact)
+})
 
-}
-exports.updateContact = (req, res) => {
-  const contacts = req.contacts
-  const {name, phone, email} = req.newContact
-    const { contactId } = req.params
-    const contact = contacts.find(({id}) => id === contactId) 
-    contact.name = name
-    contact.email = email
-    contact.phone = phone
-    fs.writeFile('./models/contacts.json', JSON.stringify(contacts, null, 2))
-    res.status(200).json(contact)
-}
+exports.updateContact = catchAsync(async (req, res) => {
+  const { contactId } = req.params
+  const updatedContact = await updateContactData(contactId, req.body)
+  res.status(200).json(updatedContact)
+})
+
+exports.updateFavorite = catchAsync(async (req, res) => {
+  const { favorite } = req.body
+  const { contactId } = req.params
+  const updatedContact = await updateContactFavorite(contactId, favorite)
+  res.status(200).json(updatedContact)
+})

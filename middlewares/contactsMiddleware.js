@@ -1,47 +1,44 @@
-const fs = require('fs').promises
-
 const { AppError, catchAsync, contactsValidators } = require('../utils')
-
-exports.readFile = catchAsync(async (req, res, next) => {
-    const contactsDB = await fs.readFile('./models/contacts.json')
-    const contacts = JSON.parse(contactsDB)
-    
-    if (!contacts) {
-        throw new AppError(404, "Not found")
-    }  
-    
-    req.contacts = contacts
-    next()
-})
+const { checkContactExistsById, checkIfBodyExist, checkContactExists, checkIfFavoriteBodyExists } = require('../services/contactServices')
 
 exports.checkContactId = catchAsync(async (req, res, next) => {
-    const contactsDB = await fs.readFile('./models/contacts.json')
-    const contacts = JSON.parse(contactsDB)
-    const { contactId } = req.params
-    const contact = contacts.find(({ id }) => id === contactId) 
-        
-    if (!contact) {
-        throw new AppError(404, "Not found")
-    }
-    
-    req.contact = contact
+    await checkContactExistsById(req.params.contactId)
     next()
 })
 
 exports.checkIfBody = catchAsync(async (req, res, next) => {
-    if (Object.keys(req.body).length === 0) {
-    throw new AppError(400, "missing fields")
-    }
+    checkIfBodyExist(req.body)
     next()
 })
 
-exports.checkContactFields = catchAsync(async (req, res, next) => {
+exports.checkCreateContactData = catchAsync(async (req, res, next) => {
     const { error, value } = contactsValidators.createContactDataValidator(req.body)
   
-  if (error) {
-    throw new AppError(400, error.message)
-  }
-    const { name, phone, email } = value
-    req.newContact = {name, phone, email}
+    if (error) {
+        throw new AppError(400, error.message)
+    }
+    
+    await checkContactExists({ email: value.email })
+    
+    req.body = value
     next()
 })
+
+exports.checkUpdateContactData = catchAsync(async (req, res, next) => {
+    const { error, value } = contactsValidators.createContactDataValidator(req.body)
+  
+    if (error) {
+        throw new AppError(400, error.message)
+    }
+    
+    await checkContactExists({ email: value.email, _id: { $ne: req.params.contactId } })
+    
+    req.body = value
+    next()
+})
+
+exports.checkFavoriteBody = catchAsync(async (req, res, next) => {
+    checkIfFavoriteBodyExists(req.body)
+    next()
+})
+
