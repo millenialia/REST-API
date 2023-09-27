@@ -9,11 +9,15 @@ exports.getContactById = (id) => Contact.findById(id)
 
 exports.deleteContact = (id) => Contact.findByIdAndDelete(id)
 
-exports.createContact = (data) => Contact.create(data)
+exports.createContact = async (data) => {
+    const newContact = await Contact.create(data)
+    newContact.favorite = undefined
+    return newContact
+}
 
 exports.updateContactData = (id, data) => Contact.findByIdAndUpdate(id, data, { new: true });
 
-exports.updateContactFavorite = (id, favorite) => Contact.findByIdAndUpdate(id, { favorite }, { new: true });
+exports.updateContactFavorite = (id, favorite) => Contact.findByIdAndUpdate(id, { favorite }, { new: true }).select('+favorite');
 
 exports.checkContactExistsById = async (id) => {
     const idIsValid = Types.ObjectId.isValid(id)
@@ -38,10 +42,3 @@ exports.checkContactExists = async (filter) => {
 
   if (contactExists) throw new AppError(409, 'Contact with such email already exists.');
 };
-
-exports.checkIfFavoriteBodyExists = (data) =>{
-    // eslint-disable-next-line no-prototype-builtins
-    if (!data.hasOwnProperty("favorite")) {
-        throw new AppError(400, "missing field favorite")
-        }
-}
