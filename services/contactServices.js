@@ -9,7 +9,7 @@ exports.getContactById = (id) => Contact.findById(id);
 
 exports.deleteContact = (id) => Contact.findByIdAndDelete(id);
 
-exports.createContact = async (data) => Contact.create(data);
+exports.createContact = (data) => Contact.create(data);
 
 exports.updateContactData = (id, data) =>
   Contact.findByIdAndUpdate(id, data, { new: true });
