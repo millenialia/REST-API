@@ -17,7 +17,8 @@ exports.login = catchAsync(async (req, res) => {
 });
 
 exports.getUser = catchAsync(async (req, res) => {
-  res.status(200).json(req.user);
+  const { _id, ...userWithoutId } = req.user.toObject();
+  res.status(200).json(userWithoutId);
 });
 
 exports.logout = (req, res) => {
