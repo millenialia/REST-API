@@ -18,11 +18,10 @@ exports.checkUserExistsLogin = async (filter) => {
 
 exports.createUser = async (userData) => {
   const newUser = await User.create(userData);
-  newUser.password = undefined;
 
-  //   const token = loginToken(newUser.id);
+  const { _id, password, ...newUserWithoutId } = newUser.toObject();
 
-  return newUser;
+  return newUserWithoutId;
 };
 
 exports.loginUser = async (userData) => {
@@ -34,11 +33,11 @@ exports.loginUser = async (userData) => {
 
   if (!isPasswordCorrect) throw new AppError(401, "Email or password is wrong");
 
-  user.password = undefined;
+  const { _id, password, ...userWithoutId } = user.toObject();
 
   const token = loginToken(user.id);
 
-  return { token, user };
+  return { token, userWithoutId };
 };
 
 exports.updateUserSubscription = (id, subscription) =>
