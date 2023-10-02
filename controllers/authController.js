@@ -8,7 +8,7 @@ const { addToBlackList } = require("../services/jwtServices");
 
 exports.register = catchAsync(async (req, res) => {
   const newUser = await createUser(req.body);
-  res.status(201).json(newUser);
+  res.status(201).json({user:newUser});
 });
 
 exports.login = catchAsync(async (req, res) => {

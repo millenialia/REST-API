@@ -19,25 +19,25 @@ exports.checkUserExistsLogin = async (filter) => {
 exports.createUser = async (userData) => {
   const newUser = await User.create(userData);
 
-  const { _id, password, ...newUserWithoutId } = newUser.toObject();
+  const { _id, password, ...user } = newUser.toObject();
 
-  return newUserWithoutId;
+  return user;
 };
 
 exports.loginUser = async (userData) => {
-  const user = await User.findOne({ email: userData.email });
-  const isPasswordCorrect = await user.checkPassword(
+  const userLogin = await User.findOne({ email: userData.email });
+  const isPasswordCorrect = await userLogin.checkPassword(
     userData.password,
-    user.password
+    userLogin.password
   );
 
   if (!isPasswordCorrect) throw new AppError(401, "Email or password is wrong");
 
-  const { _id, password, ...userWithoutId } = user.toObject();
+  const { _id, password, ...user } = userLogin.toObject();
 
   const token = loginToken(user.id);
 
-  return { token, userWithoutId };
+  return { token, user };
 };
 
 exports.updateUserSubscription = (id, subscription) =>
