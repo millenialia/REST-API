@@ -3,22 +3,24 @@ const {
   createUser,
   loginUser,
   updateUserSubscription,
+  updateUserAvatar,
 } = require("../services/authServices");
 const { addToBlackList } = require("../services/jwtServices");
 
 exports.register = catchAsync(async (req, res) => {
-  const newUser = await createUser(req.body);
-  res.status(201).json({user:newUser});
+  const {email, subscription} = await createUser(req.body);
+  res.status(201).json({user:{email, subscription}});
 });
 
 exports.login = catchAsync(async (req, res) => {
   const currentUser = await loginUser(req.body);
-  res.status(201).json(currentUser);
+  const {token, userLogin:{email, subscription}} = currentUser
+  res.status(201).json({token, user:{email,subscription}});
 });
 
 exports.getUser = catchAsync(async (req, res) => {
-  const { _id, ...userWithoutId } = req.user.toObject();
-  res.status(200).json(userWithoutId);
+  const { email, subscription } = req.user.toObject();
+  res.status(200).json({email, subscription});
 });
 
 exports.logout = (req, res) => {
@@ -28,7 +30,11 @@ exports.logout = (req, res) => {
 };
 
 exports.updateSubscription = catchAsync(async (req, res) => {
-  const { subscription } = req.body;
-  const updatedUser = await updateUserSubscription(req.user, subscription);
-  res.status(200).json(updatedUser);
+  const { email, subscription } = await updateUserSubscription(req.user, req.body);
+  res.status(200).json({ email, subscription });
 });
+
+exports.updateAvatar = catchAsync(async (req, res) => {
+  const updatedUser = await updateUserAvatar(req.body, req.user.id, req.file)
+  res.status(200).json({"avatarURL":updatedUser.avatarURL})
+})
