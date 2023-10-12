@@ -67,3 +67,7 @@ exports.updateUserAvatar = async (userData, id, file) => {
 
   return user.save();
 }
+
+exports.checkIfAvatarBody = (data) => {
+  if (!data) throw new AppError(400, 'No image provided')
+}

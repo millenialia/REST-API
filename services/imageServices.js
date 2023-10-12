@@ -10,10 +10,11 @@ class ImageServices {
     static initUploadMiddleware(name)
 {
     const multerStorage = multer.memoryStorage();
-    const multerFilter = (req, file, cbk) => {
-  if (file.mimetype.startsWith('image/')) {
-    cbk(null, true)
-  } else {
+      const multerFilter = (req, file, cbk) => {
+        if (file.mimetype.startsWith('image/')) {
+          cbk(null, true)
+        } 
+        else {
     cbk(new AppError(400, 'Please upload images only.'), false)
   }
     }
@@ -23,7 +24,7 @@ class ImageServices {
         }).single(name)
     }
 
-    static async save(file, options) {
+  static async save(file, options) {
         if (file.size > (options?.maxSize || 1 * 1024 * 1024)) throw new AppError(400, 'File is too large')
 
         const fileName = `${uuid()}.jpeg`;

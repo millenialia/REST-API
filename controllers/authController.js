@@ -4,6 +4,7 @@ const {
   loginUser,
   updateUserSubscription,
   updateUserAvatar,
+  checkIfAvatarBody,
 } = require("../services/authServices");
 const { addToBlackList } = require("../services/jwtServices");
 
@@ -35,6 +36,7 @@ exports.updateSubscription = catchAsync(async (req, res) => {
 });
 
 exports.updateAvatar = catchAsync(async (req, res) => {
+  checkIfAvatarBody(req.file)
   const updatedUser = await updateUserAvatar(req.body, req.user.id, req.file)
   res.status(200).json({"avatarURL":updatedUser.avatarURL})
 })

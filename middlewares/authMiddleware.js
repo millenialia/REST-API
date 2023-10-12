@@ -1,6 +1,3 @@
-// const multer = require('multer')
-// const uuid = require('uuid').v4
-
 const { catchAsync, authValidators, AppError } = require("../utils");
 const {
   checkUserExists,
@@ -58,31 +55,5 @@ exports.checkSubscriptionBody = catchAsync(async (req, res, next) => {
   req.body = value;
   next();
 });
-
-// const multerStorage = multer.diskStorage({
-//   destination: (req, file, cbk) => {
-//     cbk(null, 'tmp')
-//   },
-//   filename: (req, file, cbk) => {
-//     const extension = file.mimetype.split('/')[1]
-//     cbk(null, `${req.user.id}-${uuid()}.${extension}`)
-//   }
-// })
-
-// const multerFilter = (req, file, cbk) => {
-//   if (file.mimetype.startsWith('image/')) {
-//     cbk(null, true)
-//   } else {
-//     cbk(new AppError(400, 'Please upload images only.'), false)
-//   }
-// }
-
-// exports.uploadUserAvatar = multer({
-//   storage: multerStorage,
-//   fileFilter: multerFilter,
-//   limits: {
-//     fileSize: 2 * 1024 * 1024
-//   }
-// }).single('avatar')
 
 exports.uploadUserAvatar = ImageServices.initUploadMiddleware('avatar')

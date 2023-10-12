@@ -71,3 +71,4 @@ exports.checkContactExists = async (filter) => {
   if (contactExists)
     throw new AppError(409, "Contact with such email already exists.");
 };
+
