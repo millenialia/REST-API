@@ -5,6 +5,7 @@ const {
   getUserById,
 } = require("../services/authServices");
 const { checkToken } = require("../services/jwtServices");
+const ImageServices = require('../services/imageServices');
 
 exports.checkRegisterUserData = catchAsync(async (req, res, next) => {
   const { error, value } = authValidators.createUserDataValidator(req.body);
@@ -54,3 +55,5 @@ exports.checkSubscriptionBody = catchAsync(async (req, res, next) => {
   req.body = value;
   next();
 });
+
+exports.uploadUserAvatar = ImageServices.initUploadMiddleware('avatar')

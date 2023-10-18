@@ -1,5 +1,6 @@
 const { model, Schema } = require("mongoose");
 const { compare, genSalt, hash } = require("bcrypt");
+const crypto = require('crypto')
 
 const userSchema = new Schema(
   {
@@ -18,6 +19,7 @@ const userSchema = new Schema(
       default: "starter",
     },
     token: String,
+    avatarURL: String,
   },
   {
     versionKey: false,
@@ -25,6 +27,13 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", async function (next) {
+
+  if (this.isNew) {
+    const emailHash = crypto.createHash('md5').update(this.email).digest('hex')
+
+    this.avatarURL=`https://www.gravatar.com/avatar/${emailHash}.jpeg?d=retro`
+  }
+
   if (!this.isModified("password")) return next();
 
   const salt = await genSalt(10);

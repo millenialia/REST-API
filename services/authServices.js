@@ -1,5 +1,6 @@
 const User = require("../models/usersModel");
-const { AppError } = require("../utils");
+const { AppError} = require("../utils");
+const ImageServices = require("./imageServices");
 const { loginToken } = require("./jwtServices");
 
 exports.getUserById = (id) => User.findById(id);
@@ -19,9 +20,10 @@ exports.checkUserExistsLogin = async (filter) => {
 exports.createUser = async (userData) => {
   const newUser = await User.create(userData);
 
-  const { _id, password, ...user } = newUser.toObject();
+  // const { _id, password, ...user } = newUser.toObject();
 
-  return user;
+
+  return newUser;
 };
 
 exports.loginUser = async (userData) => {
@@ -33,12 +35,39 @@ exports.loginUser = async (userData) => {
 
   if (!isPasswordCorrect) throw new AppError(401, "Email or password is wrong");
 
-  const { _id, password, ...user } = userLogin.toObject();
+  // const { _id, password, ...user } = userLogin.toObject();
 
-  const token = loginToken(user.id);
+  const token = loginToken(userLogin.id);
 
-  return { token, user };
+  return { token, userLogin };
 };
 
-exports.updateUserSubscription = (id, subscription) =>
-  User.findByIdAndUpdate(id, { subscription }, { new: true });
+exports.updateUserSubscription =  async (id, data) => {
+const user = await User.findById(id);
+
+  Object.keys(data).forEach((key) => {
+    user[key] = data[key];
+  });
+
+  return user.save();
+}
+
+
+exports.updateUserAvatar = async (userData, id, file) => {
+  const user = await User.findById(id);
+  
+  if (file) {
+    user.avatarURL = await ImageServices.save(file, {})
+  }
+
+  
+  Object.keys(userData).forEach((key) => {
+    user[key] = userData[key];
+  });
+
+  return user.save();
+}
+
+exports.checkIfAvatarBody = (data) => {
+  if (!data) throw new AppError(400, 'No image provided')
+}
