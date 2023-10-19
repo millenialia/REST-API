@@ -3,6 +3,7 @@ const {
   checkUserExists,
   checkUserExistsLogin,
   getUserById,
+  getUserByEmail,
 } = require("../services/authServices");
 const { checkToken } = require("../services/jwtServices");
 const ImageServices = require('../services/imageServices');
@@ -33,6 +34,12 @@ exports.checkLoginUserData = catchAsync(async (req, res, next) => {
   next();
 });
 
+exports.protectLogin = catchAsync(async (req, res, next) => {
+  const currentUser = await getUserByEmail(req.body.email);
+  if (!currentUser.verify) throw new AppError(401, "Not authorized");
+  next();
+});
+
 exports.protect = catchAsync(async (req, res, next) => {
   const token =
     req.headers.authorization?.startsWith("Bearer") &&
@@ -47,6 +54,17 @@ exports.protect = catchAsync(async (req, res, next) => {
 
 exports.checkSubscriptionBody = catchAsync(async (req, res, next) => {
   const { error, value } = authValidators.SubscriptionDataValidator(req.body);
+
+  if (error) {
+    throw new AppError(400, error.message);
+  }
+
+  req.body = value;
+  next();
+});
+
+exports.checkVerifyBody = catchAsync(async (req, res, next) => {
+  const { error, value } = authValidators.VerifyEmailValidator(req.body);
 
   if (error) {
     throw new AppError(400, error.message);

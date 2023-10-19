@@ -10,7 +10,11 @@ router.post(
   authController.register
 );
 
-router.post("/login", authMiddleware.checkLoginUserData, authController.login);
+router.get("/verify/:verificationToken", authController.verifyToken)
+
+router.post("/verify", authMiddleware.checkVerifyBody, authController.verifyEmail)
+
+router.post("/login", authMiddleware.checkLoginUserData, authMiddleware.protectLogin, authController.login);
 
 router.use(authMiddleware.protect);
 

@@ -41,3 +41,13 @@ exports.SubscriptionDataValidator = (data) =>
         .valid(...Object.values(userSubscriptionEnum)),
     })
     .validate(data);
+
+exports.VerifyEmailValidator = (data) =>
+  Joi.object()
+    .keys({
+      email: Joi.string()
+        .email()
+        .required()
+        .messages({ "any.required": "Missing required email field" })
+    })
+    .validate(data);
