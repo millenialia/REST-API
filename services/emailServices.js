@@ -21,7 +21,7 @@ const mailgun = new Mailgun(formData);
 const mg = mailgun.client({username: 'api', key: process.env.API_MAILGUN});
 
 exports.sendVerificationEmail = async (email,verificationToken) => {
-mg.messages.create('sandboxa327fb01e7a4416191c349d0930d24f8.mailgun.org', {
+mg.messages.create('sandbox9c2f09f12d7043a4947c3f5df75b63db.mailgun.org', {
 	from: "Excited User <mailgun@sandbox-123.mailgun.org>",
 	to: [email],
 	subject: "Hello",
