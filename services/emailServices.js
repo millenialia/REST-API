@@ -18,7 +18,7 @@
 const formData = require('form-data');
 const Mailgun = require('mailgun.js');
 const mailgun = new Mailgun(formData);
-const mg = mailgun.client({username: 'api', key: "af094315e8a98f6d62b81f6e1b666bc3-3750a53b-57240371"});
+const mg = mailgun.client({username: 'api', key: process.env.API_MAILGUN});
 
 exports.sendVerificationEmail = async (email,verificationToken) => {
 mg.messages.create('sandboxa327fb01e7a4416191c349d0930d24f8.mailgun.org', {
