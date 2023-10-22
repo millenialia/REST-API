@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 
 dotenv.config({
-  path: "./environments/development.env",
+  path: "./.env",
 });
 
 const contactsRouter = require("./routes/api/contacts");

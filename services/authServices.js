@@ -4,25 +4,22 @@ const ImageServices = require("./imageServices");
 const { loginToken } = require("./jwtServices");
 
 exports.getUserById = (id) => User.findById(id);
+exports.getUserByEmail = (email) => User.findOne({email});
 
 exports.checkUserExists = async (filter) => {
-  const contactExists = await User.exists(filter);
+  const userExists = await User.exists(filter);
 
-  if (contactExists) throw new AppError(409, "Email in use");
+  if (userExists) throw new AppError(409, "Email in use");
 };
 
 exports.checkUserExistsLogin = async (filter) => {
-  const contactExists = await User.exists(filter);
+  const userExists = await User.exists(filter);
 
-  if (!contactExists) throw new AppError(401, "Email or password is wrong");
+  if (!userExists) throw new AppError(401, "Email or password is wrong");
 };
 
 exports.createUser = async (userData) => {
   const newUser = await User.create(userData);
-
-  // const { _id, password, ...user } = newUser.toObject();
-
-
   return newUser;
 };
 
@@ -35,12 +32,20 @@ exports.loginUser = async (userData) => {
 
   if (!isPasswordCorrect) throw new AppError(401, "Email or password is wrong");
 
-  // const { _id, password, ...user } = userLogin.toObject();
-
   const token = loginToken(userLogin.id);
 
   return { token, userLogin };
 };
+
+exports.checkVerificationToken = async (verificationToken) => {
+  const user = await User.findOne({ verificationToken });
+
+  if (!user) throw new AppError(404, "User not found!");
+
+  user.verify = true;
+  user.verificationToken = null
+  await user.save()
+}
 
 exports.updateUserSubscription =  async (id, data) => {
 const user = await User.findById(id);
